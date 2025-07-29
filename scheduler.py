@@ -116,26 +116,29 @@ def fetch_jobs(job_id=None):
 
 
 def execute_job(job_data):
+    start_time = time.time()
+    PostgreSession = cfg.get_postgres_session()
     job_logger = get_logger('executor')
+
+    # job infos
     job_id = job_data.get('job_id', None)
     job_name = job_data.get('name', 'Unknown Job')
-    start_time = time.time()
-    log_info(job_logger, f"Starting job execution: '{job_name}'", job_id=job_id)
-
     absolute_path = None
 
+    log_info(job_logger, f"Starting job execution: '{job_name}'", job_id=job_id)
+    
+    def set_exec_time():
+        with PostgreSession() as session:
+            job = session.get(JobHE, job_id)
+
+            if job:
+                job.last_exec = datetime.now()
+                session.commit()
+
     try:
-        accum_type = job_data['export_type']
-        #days_offset = int(job_data['days_offset'])
         archive_path = job_data['export_path']
         archive_name_with_extention = job_data['export_name'] + '.csv'
-        check_parameter = job_data['check_parameter']
-        if check_parameter:
-            parameter_id = job_data['parameter_id']
-        else:
-            parameter_id = None
 
-        data_primary_key = job_data['data_primary_key']
         sql = job_data['sql_script']
 
         if not sql:
@@ -184,13 +187,19 @@ def execute_job(job_data):
         
         end_time = time.time()
         duration_ms = int((end_time - start_time) * 1000)
+
+        set_exec_time()
+
         log_info(job_logger, f"Job '{job_name}' finished successfully. Exported {rows_exported} rows.", job_id=job_id, duration_ms=duration_ms)
 
     except FileNotFoundError:
+        set_exec_time()
         log_exception(job_logger, f"Job '{job_name}': Error creating/writing file at '{absolute_path}'. Check path and permissions.", job_id=job_id)
     except oracledb.DatabaseError as ora_err:
+         set_exec_time()
          log_exception(job_logger, f"Job '{job_name}': Oracle Database Error during execution: {ora_err}", job_id=job_id)
     except Exception as error:
+        set_exec_time()
         end_time = time.time()
         duration_ms = int((end_time - start_time) * 1000)
         # Use log_exception to include traceback

@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     with OracleSession() as session:
         # Executa um SQL text
-        result = session.execute(text("SELECT CD_UPNIVEL1 FROM PIMSCS.HISTMANEJO WHERE DT_HISTORICO = '30/06/2025'"))
+        result = session.execute(text("SELECT SYSDATE FROM DUAL"))
         
         # Itera sobre o ResultProxy
         for row in result:

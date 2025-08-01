@@ -79,6 +79,3 @@ class Log(Base):
     user_name   = Column(Text)
     log_text    = Column(Text, nullable=False)
     duration_ms = Column(Integer)
-
-    # Relação com JobHE
-    job = relationship('JobHE', back_populates='logs')

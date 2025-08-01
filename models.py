@@ -42,12 +42,6 @@ class JobHE(Base):
         cascade='all, delete-orphan'
     )
 
-    # Logs relacionados
-    logs = relationship(
-        'Log',
-        back_populates='job'
-    )
-
 
 class JobDE(Base):
     __tablename__ = 'jobs_de'
@@ -81,13 +75,7 @@ class Log(Base):
     timestamp   = Column(DateTime, default=datetime.now, nullable=False)
     log_level   = Column(Text)
     logger_name = Column(Text)
-    job_id      = Column(
-        Integer,
-        ForeignKey(
-            'sql_scheduler.jobs_he.job_id',
-            ondelete='SET NULL'
-        )
-    )
+    job_id      = Column(Integer)
     user_name   = Column(Text)
     log_text    = Column(Text, nullable=False)
     duration_ms = Column(Integer)

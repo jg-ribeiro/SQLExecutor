@@ -29,17 +29,17 @@ Json files aux function
 def open_json() -> dict:
     base_content = """{
   "oracle_database": {
-    "TSN": "",
-    "INSTANT_CLIENT": "",
-    "user_name": "",
-    "user_pass": "",
+    "TSN": "tsnname",
+    "INSTANT_CLIENT": "path",
+    "user_name": "uname",
+    "user_pass": "pwd"
   },
   "postgres":{
     "hostname": "localhost",
     "port": "5432",
-    "database": "",
-    "username": "",
-    "password": ""
+    "database": "postgres",
+    "username": "postgres",
+    "password": "postgres"
   }
 }"""
 
